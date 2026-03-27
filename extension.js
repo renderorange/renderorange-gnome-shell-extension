@@ -12,12 +12,163 @@ const ExtensionUtils = imports.misc.extensionUtils;
 
 let _activitiesButton = null;
 let _settings = null;
+let _settingsChangedId = 0;
+let _dynamicStylesheetFile = null;
+let _dynamicStylesheetPath = null;
 
 function getSettings() {
     if (!_settings) {
         _settings = ExtensionUtils.getSettings();
     }
     return _settings;
+}
+
+function _normalizeHexColor(value) {
+    if (typeof value !== 'string')
+        return '#444444';
+
+    const match = value.trim().match(/^#([0-9a-fA-F]{6})$/);
+    if (!match)
+        return '#444444';
+
+    return `#${match[1].toLowerCase()}`;
+}
+
+function _createDynamicStylesheetPath() {
+    const timestamp = GLib.get_real_time();
+    return GLib.build_filenamev([
+        GLib.get_tmp_dir(),
+        `renderorange-dynamic-${timestamp}.css`,
+    ]);
+}
+
+function _hexToRgba(hex, alpha) {
+    const normalized = _normalizeHexColor(hex).slice(1);
+    const red = parseInt(normalized.slice(0, 2), 16);
+    const green = parseInt(normalized.slice(2, 4), 16);
+    const blue = parseInt(normalized.slice(4, 6), 16);
+    return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+}
+
+function applyDynamicStyles() {
+    const settings = getSettings();
+    const accent = _normalizeHexColor(settings.get_string('gtk-popup-accent'));
+    const tilePreview = _hexToRgba(accent, 0.5);
+
+    const css = `
+        .toggle-switch:checked,
+        .toggle-switch:active,
+        .popover-menu-item.selected,
+        .popover-menuitem.selected,
+        StButton.popup-menu-item.selected,
+        .popup-menu-item.selected,
+        .popup-menu-item:selected,
+        .calendar-day-selected:focus,
+        .calendar-day-selected:hover,
+        .calendar-day-selected,
+        .quick-menu-toggle:checked,
+        .quick-menu-toggle:checked:hover,
+        .quick-menu-toggle:checked:focus,
+        .quick-menu-toggle:checked:active,
+        .quick-toggle:checked,
+        .quick-toggle:checked:hover,
+        .quick-toggle:checked:focus,
+        .quick-toggle:checked:active,
+        .quick-toggle-menu .header .icon.active {
+            background-color: ${accent} !important;
+            background-image: none !important;
+            border-color: transparent !important;
+        }
+
+        .quick-toggle:checked,
+        .quick-toggle:checked:hover,
+        .quick-toggle:checked:focus,
+        .quick-toggle:checked:active {
+            color: #ffffff !important;
+        }
+
+        .slider,
+        .quick-settings .slider,
+        .quick-slider .slider {
+            -barlevel-active-background-color: ${accent} !important;
+            -barlevel-active-border-color: transparent !important;
+        }
+
+        .quick-slider .slider-bin:focus,
+        .quick-slider .slider-bin:focus:hover,
+        .quick-slider .slider-bin:focus:active {
+            box-shadow: inset 0 0 0 2px ${accent} !important;
+        }
+
+        StSwitch toggle-switch:checked {
+            background-color: ${accent} !important;
+        }
+
+        .quick-toggle:checked:focus {
+            box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.24) !important;
+        }
+
+        .tile-preview {
+            background-color: ${tilePreview} !important;
+            border: 1px solid ${accent} !important;
+        }
+    `;
+
+    try {
+        const theme = St.ThemeContext.get_for_stage(global.stage).get_theme();
+        const path = _createDynamicStylesheetPath();
+
+        if (!GLib.file_set_contents(path, css))
+            throw new Error('Could not write dynamic stylesheet to ' + path);
+
+        const stylesheet = Gio.File.new_for_path(path);
+        if (_dynamicStylesheetFile) {
+            try {
+                theme.unload_stylesheet(_dynamicStylesheetFile);
+            } catch (e) {
+                log('[RenderOrange] Could not unload previous dynamic stylesheet: ' + e);
+            }
+        }
+
+        theme.load_stylesheet(stylesheet);
+
+        if (_dynamicStylesheetPath) {
+            try {
+                Gio.File.new_for_path(_dynamicStylesheetPath).delete(null);
+            } catch (e) {
+                log('[RenderOrange] Could not delete old dynamic stylesheet: ' + e);
+            }
+        }
+
+        _dynamicStylesheetFile = stylesheet;
+        _dynamicStylesheetPath = path;
+        log('[RenderOrange] Applied popup accent: ' + accent);
+    } catch (e) {
+        log('[RenderOrange] Failed to apply dynamic styles: ' + e);
+    }
+}
+
+function unloadDynamicStyles() {
+    if (_dynamicStylesheetFile) {
+        try {
+            const theme = St.ThemeContext.get_for_stage(global.stage).get_theme();
+            theme.unload_stylesheet(_dynamicStylesheetFile);
+        } catch (e) {
+            log('[RenderOrange] Failed to unload dynamic stylesheet: ' + e);
+        }
+
+        _dynamicStylesheetFile = null;
+    }
+
+    if (_dynamicStylesheetPath) {
+        try {
+            Gio.File.new_for_path(_dynamicStylesheetPath).delete(null);
+        } catch (e) {
+            log('[RenderOrange] Failed to delete dynamic stylesheet file: ' + e);
+        }
+
+        _dynamicStylesheetPath = null;
+    }
 }
 
 /**
@@ -56,7 +207,7 @@ function cleanClock() {
             if (container.style_class && 
                 (container.style_class.includes('clock-display') || 
                  container.style_class.includes('clock'))) {
-                container.set_style('background: transparent !important; border: none !important; box-shadow: none !important;');
+                container.set_style('background: transparent !important; border: none !important; box-shadow: none !important; font-weight: 500 !important;');
             }
             if (container.get_children) {
                 container.get_children().forEach(child => findAndCleanClock(child));
@@ -369,13 +520,16 @@ function enable() {
     const settings = getSettings();
     
     // Listen for settings changes
-    settings.connect('changed', (schema, key) => {
+    _settingsChangedId = settings.connect('changed', (schema, key) => {
         log('[RenderOrange] Setting changed: ' + key);
-        if (key === 'clock-format' || key === 'show-seconds' || key === 'show-date' || key === 'selection-color') {
+        if (key === 'clock-format' || key === 'show-seconds' || key === 'show-date') {
             configureClockFormat();
         }
         if (key.startsWith('show-')) {
             configureCalendarVisibility();
+        }
+        if (key === 'gtk-popup-accent') {
+            applyDynamicStyles();
         }
         if (key === 'workspace-popup') {
             configureWorkspacePopup();
@@ -404,6 +558,7 @@ function enable() {
     configureAnimations();
     configureWorkspaceIndicator();
     configureAppMenu();
+    applyDynamicStyles();
     
     GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1000, () => {
         configureActivities();
@@ -416,6 +571,7 @@ function enable() {
         configureAnimations();
         configureWorkspaceIndicator();
         configureAppMenu();
+        applyDynamicStyles();
         return false;
     });
     
@@ -430,6 +586,7 @@ function enable() {
         configureAnimations();
         configureWorkspaceIndicator();
         configureAppMenu();
+        applyDynamicStyles();
         return false;
     });
 }
@@ -439,6 +596,14 @@ function enable() {
  */
 function disable() {
     log('[RenderOrange] Disabling...');
+
+    const settings = getSettings();
+    if (_settingsChangedId) {
+        settings.disconnect(_settingsChangedId);
+        _settingsChangedId = 0;
+    }
+
+    unloadDynamicStyles();
 }
 
 /**

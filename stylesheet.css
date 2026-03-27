@@ -28,23 +28,61 @@ stage {
     padding: 4px;
 }
 
-/* Override blue accent color - applied to toggle switches and selections */
-.toggle-switch:checked,
-.toggle-switch:active,
-.popover-menu-item.selected,
-.popover-menuitem.selected,
-StButton.popup-menu-item.selected,
-.popup-menu-item.selected,
-.calendar-day-selected:focus,
-.calendar-day-selected:hover,
-.calendar-day-selected {
-    background-color: #444444 !important;
-    border-radius: 2px !important;
+#panel .clock,
+#panel .clock-display {
+    font-weight: 500;
 }
 
-StSwitch toggle-switch:checked {
-    background-color: #444444 !important;
-    border-radius: 2px !important;
+/* Remove elevated shadows from shell UI surfaces */
+.modal-dialog,
+.prompt-dialog,
+.dialog,
+.message-dialog,
+.popup-menu,
+.popup-menu-content,
+.popup-menu-boxpointer,
+.quick-settings,
+.calendar,
+.notification-banner,
+.message,
+.osd-window,
+.switcher-list,
+.workspace-switcher,
+.workspace-switcher-container,
+.app-folder-dialog,
+.candidate-popup-content,
+.screenshot-ui-panel,
+.screenshot-ui-screen-screenshot {
+    box-shadow: none !important;
+}
+
+/* Keep popups rounded but less exaggerated */
+.popup-menu,
+.popup-menu-content,
+.popup-menu-boxpointer,
+.quick-settings,
+.calendar,
+.candidate-popup-content,
+.app-folder-dialog {
+    border-radius: 8px !important;
+}
+
+/* Dock app icon corner radius */
+#dash .app-well-app .overview-icon,
+#dash .show-apps .overview-icon,
+.dash-item-container .app-well-app .overview-icon,
+.dash-item-container .show-apps .overview-icon {
+    border-radius: 8px !important;
+}
+
+/* Dock container corner radius */
+.dash-background {
+    border-radius: 8px !important;
+    padding: 12px 2px !important;
+}
+
+.dash-item-container > * {
+    margin: 0 !important;
 }
 
 /* Custom workspace indicator */

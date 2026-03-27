@@ -61,5 +61,15 @@
       <summary>Show Activities button</summary>
       <description>Show the Activities button in the top bar</description>
     </key>
+    <key name="gtk-popup-accent" type="s">
+      <default>"#444444"</default>
+      <summary>GTK popup accent color</summary>
+      <description>Accent color used for popup selections and toggles</description>
+    </key>
+    <key name="highlight-color" type="s">
+      <default>"#3584e4"</default>
+      <summary>Highlight color</summary>
+      <description>Accent color used for calendar selection and buttons</description>
+    </key>
   </schema>
 </schemalist>
