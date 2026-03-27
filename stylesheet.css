@@ -78,7 +78,49 @@ stage {
 /* Dock container corner radius */
 .dash-background {
     border-radius: 8px !important;
-    padding: 12px 2px !important;
+    padding: 5px 0 !important;
+}
+
+/* Reduce dash item margins to match */
+#dash .dash-item-container .show-apps,
+#dash .dash-item-container .overview-tile {
+    margin: 0 0 !important;
+}
+
+/* Remove dash item container padding */
+#dash .dash-item-container {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Also target the padding on dash itself */
+#dash {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Dock tooltip border-radius */
+.dash-label {
+    border-radius: 8px !important;
+}
+
+/* Calendar day styling */
+.calendar-day {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.calendar-today {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Button border-radius matching popup */
+.popup-menu-content .button,
+.popup-menu-content StButton,
+.popup-menu-item .button,
+.popup-menu-item StButton {
+    border-radius: 8px !important;
 }
 
 .dash-item-container > * {
