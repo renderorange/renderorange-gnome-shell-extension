@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="renderorange">
+  <schema id="org.gnome.shell.extensions.renderorange" path="/org/gnome/shell/extensions/renderorange/">
+    <key name="clock-format" type="s">
+      <default>"24h"</default>
+      <summary>Clock format</summary>
+      <description>Time format: 24h, 12h, or filesystem</description>
+    </key>
+    <key name="show-seconds" type="b">
+      <default>false</default>
+      <summary>Show seconds</summary>
+      <description>Whether to show seconds in the clock</description>
+    </key>
+    <key name="show-date" type="b">
+      <default>false</default>
+      <summary>Show date</summary>
+      <description>Whether to show date in the clock</description>
+    </key>
+    <key name="show-calendar" type="b">
+      <default>true</default>
+      <summary>Show calendar</summary>
+      <description>Whether to show the calendar in the date menu</description>
+    </key>
+    <key name="show-events" type="b">
+      <default>true</default>
+      <summary>Show events</summary>
+      <description>Whether to show events in the date menu</description>
+    </key>
+    <key name="show-world-clocks" type="b">
+      <default>true</default>
+      <summary>Show world clocks</summary>
+      <description>Whether to show world clocks in the date menu</description>
+    </key>
+    <key name="show-weather" type="b">
+      <default>true</default>
+      <summary>Show weather</summary>
+      <description>Whether to show weather in the date menu</description>
+    </key>
+    <key name="workspace-popup" type="b">
+      <default>true</default>
+      <summary>Show workspace popup</summary>
+      <description>Whether to show workspace popup when switching</description>
+    </key>
+    <key name="animations" type="b">
+      <default>true</default>
+      <summary>Enable animations</summary>
+      <description>Whether to enable GNOME animations</description>
+    </key>
+    <key name="workspace-indicator" type="b">
+      <default>true</default>
+      <summary>Show workspace indicator</summary>
+      <description>Show workspace indicator in top bar</description>
+    </key>
+    <key name="show-app-menu" type="b">
+      <default>false</default>
+      <summary>Show App Menu</summary>
+      <description>Show the app menu in the top bar</description>
+    </key>
+    <key name="show-activities" type="b">
+      <default>false</default>
+      <summary>Show Activities button</summary>
+      <description>Show the Activities button in the top bar</description>
+    </key>
+  </schema>
+</schemalist>

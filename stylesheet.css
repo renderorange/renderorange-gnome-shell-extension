@@ -1,0 +1,94 @@
+/* RenderOrange Theme - Minimal top bar like Regolith/i3 */
+
+stage {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+}
+
+#panel {
+    background-color: #333333;
+    border-bottom: none;
+    box-shadow: none;
+}
+
+#panel .panel-button {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+#panel .panel-button:hover,
+#panel .panel-button:focus,
+#panel .panel-button:active {
+    background-color: transparent;
+}
+
+#panel .system-status-icon {
+    icon-size: 16px;
+    padding: 4px;
+}
+
+/* Override blue accent color - applied to toggle switches and selections */
+.toggle-switch:checked,
+.toggle-switch:active,
+.popover-menu-item.selected,
+.popover-menuitem.selected,
+StButton.popup-menu-item.selected,
+.popup-menu-item.selected,
+.calendar-day-selected:focus,
+.calendar-day-selected:hover,
+.calendar-day-selected {
+    background-color: #444444 !important;
+    border-radius: 2px !important;
+}
+
+StSwitch toggle-switch:checked {
+    background-color: #444444 !important;
+    border-radius: 2px !important;
+}
+
+/* Custom workspace indicator */
+.renderorange-workspace-indicator {
+    padding: 0;
+    spacing: 2px;
+}
+
+.renderorange-workspace-indicator .workspace-label {
+    font-size: 14px;
+    text-align: center;
+    min-width: 36px;
+}
+
+.renderorange-workspace-indicator StBoxLayout {
+    min-width: 36px;
+    margin: 0;
+    padding: 0;
+}
+
+/* Calendar widget visibility - using stage class approach */
+.renderorange-no-weather .weather-button,
+.renderorange-no-weather .weather-button * {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    height: 0;
+    width: 0;
+}
+
+.renderorange-no-world-clocks .world-clocks-button,
+.renderorange-no-world-clocks .world-clocks-button * {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    height: 0;
+    width: 0;
+}
+
+.renderorange-no-events-button .events-button,
+.renderorange-no-events-button .events-button * {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    height: 0;
+    width: 0;
+}

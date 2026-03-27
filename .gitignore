@@ -8,5 +8,11 @@ Thumbs.db
 *.swp
 *.swo
 
+# backup
+*.back
+
 # don't remove this one, hommie
 tmp/
+
+# compiled theme stuff that should never go into the repo
+gschemas.compiled

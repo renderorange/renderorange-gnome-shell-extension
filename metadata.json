@@ -1,0 +1,8 @@
+{
+  "description": "Customize settings for GNOME Shell",
+  "name": "renderorange",
+  "shell-version": ["43"],
+  "uuid": "renderorange@renderorange",
+  "version": "1",
+  "settings-schema": "org.gnome.shell.extensions.renderorange"
+}
