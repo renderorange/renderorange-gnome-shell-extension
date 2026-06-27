@@ -403,7 +403,8 @@ function configureAnimations() {
  * Configure workspace indicator in top bar - create custom indicator
  */
 let _workspaceIndicatorActor = null;
-let _workspaceSignalId = null;
+let _workspaceSignalIds = [];
+let _workspaceClickId = 0;
 
 function createWorkspaceIndicator() {
     if (_workspaceIndicatorActor) return;
@@ -413,8 +414,8 @@ function createWorkspaceIndicator() {
     // Create container for workspace dots
     const container = new St.BoxLayout({
         style_class: 'renderorange-workspace-indicator',
-        reactive: false,
-        track_hover: false
+        reactive: true,
+        track_hover: true
     });
     
     _workspaceIndicatorActor = container;
@@ -425,14 +426,27 @@ function createWorkspaceIndicator() {
         log('[RenderOrange] Added custom workspace indicator');
     }
     
+    // Click handler: open overview with applications grid
+    _workspaceClickId = container.connect('button-release-event', () => {
+        if (Main.overview.visible) {
+            Main.overview.hide();
+        } else {
+            Main.overview.show();
+            if (Main.overview.viewSelector) {
+                Main.overview.viewSelector._showApps();
+            }
+        }
+        return Clutter.EVENT_STOP;
+    });
+    
     // Update dots when workspace changes
     updateWorkspaceDots();
     
     // Listen for workspace changes
     const workspaceManager = global.workspace_manager;
-    _workspaceSignalId = workspaceManager.connect('workspace-added', updateWorkspaceDots);
-    workspaceManager.connect('workspace-removed', updateWorkspaceDots);
-    workspaceManager.connect('active-workspace-changed', updateWorkspaceDots);
+    _workspaceSignalIds.push(workspaceManager.connect('workspace-added', updateWorkspaceDots));
+    _workspaceSignalIds.push(workspaceManager.connect('workspace-removed', updateWorkspaceDots));
+    _workspaceSignalIds.push(workspaceManager.connect('active-workspace-changed', updateWorkspaceDots));
 }
 
 function updateWorkspaceDots() {
@@ -601,6 +615,17 @@ function disable() {
     if (_settingsChangedId) {
         settings.disconnect(_settingsChangedId);
         _settingsChangedId = 0;
+    }
+
+    if (_workspaceClickId && _workspaceIndicatorActor) {
+        _workspaceIndicatorActor.disconnect(_workspaceClickId);
+        _workspaceClickId = 0;
+    }
+
+    if (_workspaceSignalIds.length > 0) {
+        const workspaceManager = global.workspace_manager;
+        _workspaceSignalIds.forEach(id => workspaceManager.disconnect(id));
+        _workspaceSignalIds = [];
     }
 
     unloadDynamicStyles();
