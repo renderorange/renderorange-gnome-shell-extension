@@ -3,6 +3,6 @@
   "name": "renderorange",
   "shell-version": ["43"],
   "uuid": "renderorange@renderorange",
-  "version": "1",
+  "version": "2",
   "settings-schema": "org.gnome.shell.extensions.renderorange"
 }

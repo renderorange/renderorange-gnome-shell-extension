@@ -15,6 +15,7 @@ let _settings = null;
 let _settingsChangedId = 0;
 let _dynamicStylesheetFile = null;
 let _dynamicStylesheetPath = null;
+let _sessionModeId = 0;
 
 function getSettings() {
     if (!_settings) {
@@ -507,6 +508,18 @@ function updateWorkspaceDots() {
     log('[RenderOrange] Added ' + numWorkspaces + ' boxes');
 }
 
+function _ensureWorkspaceIndicatorInPanel() {
+    if (!_workspaceIndicatorActor || !Main.panel._leftBox)
+        return;
+    try {
+        const parent = _workspaceIndicatorActor.get_parent();
+        if (!parent)
+            Main.panel._leftBox.insert_child_at_index(_workspaceIndicatorActor, 0);
+    } catch (e) {
+        log('[RenderOrange] Could not re-parent workspace indicator: ' + e);
+    }
+}
+
 function configureWorkspaceIndicator() {
     const settings = getSettings();
     const showIndicator = settings.get_boolean('workspace-indicator');
@@ -514,6 +527,8 @@ function configureWorkspaceIndicator() {
     if (showIndicator) {
         if (!_workspaceIndicatorActor) {
             createWorkspaceIndicator();
+        } else {
+            _ensureWorkspaceIndicatorInPanel();
         }
         _workspaceIndicatorActor.show();
     } else {
@@ -523,6 +538,22 @@ function configureWorkspaceIndicator() {
     }
     
     log('[RenderOrange] Workspace indicator configured');
+}
+
+function _onSessionUpdated() {
+    if (Main.sessionMode.isLocked) {
+        if (Main.panel)
+            Main.panel.hide();
+    } else {
+        if (Main.panel)
+            Main.panel.show();
+        minimizePanel();
+        moveClockToRight();
+        cleanClock();
+        configureWorkspaceIndicator();
+        configureAppMenu();
+        configureActivities();
+    }
 }
 
 /**
@@ -561,6 +592,12 @@ function enable() {
             configureActivities();
         }
     });
+    
+    _sessionModeId = Main.sessionMode.connect('updated', _onSessionUpdated);
+    
+    // Apply initial lock state
+    if (Main.sessionMode.isLocked && Main.panel)
+        Main.panel.hide();
     
     configureActivities();
     cleanClock();
@@ -611,6 +648,11 @@ function enable() {
 function disable() {
     log('[RenderOrange] Disabling...');
 
+    if (_sessionModeId) {
+        Main.sessionMode.disconnect(_sessionModeId);
+        _sessionModeId = 0;
+    }
+
     const settings = getSettings();
     if (_settingsChangedId) {
         settings.disconnect(_settingsChangedId);
@@ -626,6 +668,18 @@ function disable() {
         const workspaceManager = global.workspace_manager;
         _workspaceSignalIds.forEach(id => workspaceManager.disconnect(id));
         _workspaceSignalIds = [];
+    }
+
+    if (_workspaceIndicatorActor) {
+        try {
+            const parent = _workspaceIndicatorActor.get_parent();
+            if (parent)
+                parent.remove_actor(_workspaceIndicatorActor);
+            _workspaceIndicatorActor.destroy();
+        } catch (e) {
+            log('[RenderOrange] Error cleaning up workspace indicator: ' + e);
+        }
+        _workspaceIndicatorActor = null;
     }
 
     unloadDynamicStyles();
