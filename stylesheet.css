@@ -123,6 +123,20 @@ stage {
     border-radius: 8px !important;
 }
 
+/* Split button (quick-toggle-has-menu) - form one pill shape */
+.quick-toggle-has-menu .quick-toggle {
+    border-radius: 8px 0 0 8px !important;
+}
+
+.quick-toggle-has-menu .quick-toggle-menu-button {
+    border-radius: 0 8px 8px 0 !important;
+}
+
+/* Remove the separator line between split button halves */
+.quick-toggle-separator {
+    background-color: transparent !important;
+}
+
 .dash-item-container > * {
     margin: 0 !important;
 }
