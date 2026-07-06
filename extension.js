@@ -107,6 +107,9 @@ export default class RenderOrangeExtension extends Extension {
             this._configureAppMenu();
             return false;
         }));
+
+        if (Main.panel)
+            Main.panel.show();
     }
 
     disable() {
@@ -470,6 +473,12 @@ export default class RenderOrangeExtension extends Extension {
             this._configureWorkspaceIndicator();
             this._configureAppMenu();
             this._configureActivities();
+
+            this._timeoutIds.push(GLib.timeout_add(GLib.PRIORITY_DEFAULT, 500, () => {
+                if (Main.panel && !Main.sessionMode.isLocked)
+                    Main.panel.show();
+                return false;
+            }));
         }
     }
 }
