@@ -75,6 +75,13 @@ stage {
     border-radius: 8px !important;
 }
 
+/* Remove focus/checked highlight on dash icons */
+#dash .overview-tile:checked .overview-icon,
+.dash-item-container .overview-tile:checked .overview-icon {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
 /* Dock container corner radius */
 .dash-background {
     border-radius: 8px !important;
