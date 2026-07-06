@@ -61,6 +61,16 @@
       <summary>Show Activities button</summary>
       <description>Show the Activities button in the top bar</description>
     </key>
+    <key name="font-antialiasing" type="s">
+      <default>"grayscale"</default>
+      <summary>Font antialiasing</summary>
+      <description>Font antialiasing method: none, grayscale, or rgba</description>
+    </key>
+    <key name="font-hinting" type="s">
+      <default>"slight"</default>
+      <summary>Font hinting</summary>
+      <description>Font hinting level: none, slight, medium, or full</description>
+    </key>
     <key name="gtk-popup-accent" type="s">
       <default>"#444444"</default>
       <summary>GTK popup accent color</summary>

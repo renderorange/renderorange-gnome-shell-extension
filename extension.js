@@ -42,6 +42,8 @@ export default class RenderOrangeExtension extends Extension {
         this._savedShowSeconds = this._interfaceSettings.get_boolean('clock-show-seconds');
         this._savedShowDate = this._interfaceSettings.get_boolean('clock-show-date');
         this._savedEnableAnimations = this._interfaceSettings.get_boolean('enable-animations');
+        this._savedFontAntialiasing = this._interfaceSettings.get_string('font-antialiasing');
+        this._savedFontHinting = this._interfaceSettings.get_string('font-hinting');
 
         this._settingsChangedId = this._settings.connect('changed', (_schema, key) => {
             if (key === 'clock-format' || key === 'show-seconds' || key === 'show-date')
@@ -60,6 +62,8 @@ export default class RenderOrangeExtension extends Extension {
                 this._configureAppMenu();
             if (key === 'show-activities')
                 this._configureActivities();
+            if (key === 'font-antialiasing' || key === 'font-hinting')
+                this._configureFontRendering();
         });
 
         this._sessionModeId = Main.sessionMode.connect('updated', () =>
@@ -69,6 +73,7 @@ export default class RenderOrangeExtension extends Extension {
             Main.panel.hide();
 
         this._configureActivities();
+        this._configureFontRendering();
         this._cleanClock();
         this._minimizePanel();
         this._moveClockToRight();
@@ -82,6 +87,7 @@ export default class RenderOrangeExtension extends Extension {
 
         this._timeoutIds.push(GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1000, () => {
             this._configureActivities();
+            this._configureFontRendering();
             this._cleanClock();
             this._minimizePanel();
             this._moveClockToRight();
@@ -97,6 +103,7 @@ export default class RenderOrangeExtension extends Extension {
 
         this._timeoutIds.push(GLib.timeout_add(GLib.PRIORITY_DEFAULT, 3000, () => {
             this._configureActivities();
+            this._configureFontRendering();
             this._cleanClock();
             this._minimizePanel();
             this._moveClockToRight();
@@ -167,6 +174,8 @@ export default class RenderOrangeExtension extends Extension {
             this._interfaceSettings.set_boolean('clock-show-seconds', this._savedShowSeconds);
             this._interfaceSettings.set_boolean('clock-show-date', this._savedShowDate);
             this._interfaceSettings.set_boolean('enable-animations', this._savedEnableAnimations);
+            this._interfaceSettings.set_string('font-antialiasing', this._savedFontAntialiasing);
+            this._interfaceSettings.set_string('font-hinting', this._savedFontHinting);
         } catch (e) {
             console.warn(`[RenderOrange] Error reverting system settings: ${e}`);
         }
@@ -485,6 +494,17 @@ export default class RenderOrangeExtension extends Extension {
         this._interfaceSettings.set_boolean('enable-animations', enableAnimations);
     }
 
+    _configureFontRendering() {
+        try {
+            const antialiasing = this._settings.get_string('font-antialiasing');
+            const hinting = this._settings.get_string('font-hinting');
+            this._interfaceSettings.set_string('font-antialiasing', antialiasing);
+            this._interfaceSettings.set_string('font-hinting', hinting);
+        } catch (e) {
+            console.warn(`[RenderOrange] Error setting font rendering: ${e}`);
+        }
+    }
+
     _createWorkspaceIndicator() {
         if (this._workspaceIndicatorActor) return;
 
@@ -598,6 +618,7 @@ export default class RenderOrangeExtension extends Extension {
             this._minimizePanel();
             this._moveClockToRight();
             this._cleanClock();
+            this._configureFontRendering();
             this._configureWorkspaceIndicator();
             this._configureAppMenu();
             this._configureActivities();

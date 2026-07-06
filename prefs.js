@@ -80,6 +80,22 @@ function createColorRow(settings, key, title) {
     return row;
 }
 
+function createComboRow(settings, key, title, options, values) {
+    const row = new Adw.ComboRow({title});
+    const model = Gtk.StringList.new(options);
+    row.set_model(model);
+
+    const current = settings.get_string(key);
+    const currentIndex = values.indexOf(current);
+    row.set_selected(currentIndex >= 0 ? currentIndex : 0);
+
+    row.connect('notify::selected', () => {
+        settings.set_string(key, values[row.get_selected()]);
+    });
+
+    return row;
+}
+
 export default class RenderOrangePreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
         const settings = this.getSettings();
@@ -110,6 +126,14 @@ export default class RenderOrangePreferences extends ExtensionPreferences {
         behaveGroup.add(createSwitch(settings, 'show-activities', 'Activities'));
         behaveGroup.add(createColorRow(settings, 'gtk-popup-accent', 'GTK Popup Accent'));
         page.add(behaveGroup);
+
+        // Font Rendering Group
+        const fontGroup = new Adw.PreferencesGroup({title: 'Font Rendering'});
+        fontGroup.add(createComboRow(settings, 'font-antialiasing', 'Antialiasing',
+            ['None', 'Grayscale', 'Subpixel (LCD)'], ['none', 'grayscale', 'rgba']));
+        fontGroup.add(createComboRow(settings, 'font-hinting', 'Hinting',
+            ['None', 'Slight', 'Medium', 'Full'], ['none', 'slight', 'medium', 'full']));
+        page.add(fontGroup);
 
         window.add(page);
     }
