@@ -48,7 +48,7 @@ fi
 
 if [ -t 0 ]; then
     echo ""
-    read -r -p "Enable extension now? (y/N) " -n 1 REPLY
+    read -r -p "Enable extension now? (y/N) " REPLY
     echo ""
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         gnome-extensions enable "$UUID" && echo "Enabled ${UUID}"
