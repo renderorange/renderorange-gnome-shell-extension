@@ -17,3 +17,6 @@ tmp/
 # compiled theme stuff that should never go into the repo
 gschemas.compiled
 install
+
+# dev tooling
+node_modules/

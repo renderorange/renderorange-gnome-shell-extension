@@ -1,0 +1,174 @@
+/* RenderOrange Theme - Minimal top bar like Regolith/i3 */
+
+stage {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+}
+
+#panel {
+    background-color: #333333;
+    border-bottom: none;
+    box-shadow: none;
+}
+
+#panel .panel-button {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+#panel .panel-button:hover,
+#panel .panel-button:focus,
+#panel .panel-button:active {
+    background-color: transparent;
+}
+
+#panel .system-status-icon {
+    icon-size: 16px;
+    padding: 4px;
+}
+
+#panel .clock,
+#panel .clock-display {
+    font-weight: 500;
+}
+
+/* Remove elevated shadows from shell UI surfaces */
+.modal-dialog,
+.prompt-dialog,
+.dialog,
+.message-dialog,
+.popup-menu,
+.popup-menu-content,
+.popup-menu-boxpointer,
+.quick-settings,
+.calendar,
+.notification-banner,
+.message,
+.osd-window,
+.switcher-list,
+.workspace-switcher,
+.workspace-switcher-container,
+.app-folder-dialog,
+.candidate-popup-content,
+.screenshot-ui-panel,
+.screenshot-ui-screen-screenshot {
+    box-shadow: none !important;
+}
+
+/* Keep popups rounded but less exaggerated */
+.popup-menu,
+.popup-menu-content,
+.popup-menu-boxpointer,
+.quick-settings,
+.calendar,
+.candidate-popup-content,
+.app-folder-dialog {
+    border-radius: 8px !important;
+}
+
+/* Dock app icon corner radius */
+#dash .app-well-app .overview-icon,
+#dash .show-apps .overview-icon,
+.dash-item-container .app-well-app .overview-icon,
+.dash-item-container .show-apps .overview-icon {
+    border-radius: 8px !important;
+}
+
+/* Dock container corner radius */
+.dash-background {
+    border-radius: 8px !important;
+    padding: 5px 0 !important;
+}
+
+/* Reduce dash item margins to match */
+#dash .dash-item-container .show-apps,
+#dash .dash-item-container .overview-tile {
+    margin: 0 0 !important;
+}
+
+/* Remove dash item container padding */
+#dash .dash-item-container {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Also target the padding on dash itself */
+#dash {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Dock tooltip border-radius */
+.dash-label {
+    border-radius: 8px !important;
+}
+
+/* Calendar day styling */
+.calendar-day {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.calendar-today {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Button border-radius matching popup */
+.popup-menu-content .button,
+.popup-menu-content StButton,
+.popup-menu-item .button,
+.popup-menu-item StButton {
+    border-radius: 8px !important;
+}
+
+.dash-item-container > * {
+    margin: 0 !important;
+}
+
+/* Custom workspace indicator */
+.renderorange-workspace-indicator {
+    padding: 0;
+    spacing: 2px;
+}
+
+.renderorange-workspace-indicator .workspace-label {
+    font-size: 14px;
+    text-align: center;
+    min-width: 36px;
+}
+
+.renderorange-workspace-indicator StBoxLayout {
+    min-width: 36px;
+    margin: 0;
+    padding: 0;
+}
+
+/* Calendar widget visibility - using stage class approach */
+.renderorange-no-weather .weather-button,
+.renderorange-no-weather .weather-button * {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    height: 0;
+    width: 0;
+}
+
+.renderorange-no-world-clocks .world-clocks-button,
+.renderorange-no-world-clocks .world-clocks-button * {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    height: 0;
+    width: 0;
+}
+
+.renderorange-no-events-button .events-button,
+.renderorange-no-events-button .events-button * {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    height: 0;
+    width: 0;
+}

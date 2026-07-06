@@ -1,0 +1,26 @@
+{
+  "name": "renderorange-gnome-shell-extension",
+  "version": "3.0.0",
+  "description": "GNOME Shell extension for a minimal top bar",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "lint": "eslint lib.js extension.js prefs.js",
+    "check": "npm run lint && npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/renderorange/renderorange-gnome-shell-extension.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/renderorange/renderorange-gnome-shell-extension/issues"
+  },
+  "homepage": "https://github.com/renderorange/renderorange-gnome-shell-extension#readme",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.6.0"
+  }
+}

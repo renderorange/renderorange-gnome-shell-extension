@@ -1,22 +1,18 @@
 /**
  * RenderOrange Preferences
+ *
+ * Supports GNOME Shell 45+ (ESM)
+ * For GNOME Shell 43, use v43/prefs.js
  */
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Adw = imports.gi.Adw;
-const Gtk = imports.gi.Gtk;
-const Gdk = imports.gi.Gdk;
+import Adw from 'gi://Adw';
+import Gtk from 'gi://Gtk';
+import Gdk from 'gi://Gdk';
 
-function init() {
-    // No translations yet
-}
-
-function getSettings() {
-    return ExtensionUtils.getSettings();
-}
+import {ExtensionPreferences} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 function createSwitch(settings, key, title) {
-    const row = new Adw.ActionRow({ title });
+    const row = new Adw.ActionRow({title});
     const sw = new Gtk.Switch({
         valign: Gtk.Align.CENTER,
         active: settings.get_boolean(key),
@@ -33,7 +29,7 @@ function createSwitch(settings, key, title) {
 }
 
 function createClockFormatRow(settings) {
-    const row = new Adw.ComboRow({ title: 'Time Format' });
+    const row = new Adw.ComboRow({title: 'Time Format'});
     const model = Gtk.StringList.new(['24-hour', '12-hour', 'System']);
     row.set_model(model);
 
@@ -59,7 +55,7 @@ function createClockFormatRow(settings) {
 }
 
 function createColorRow(settings, key, title) {
-    const row = new Adw.ActionRow({ title });
+    const row = new Adw.ActionRow({title});
     const button = new Gtk.ColorButton({
         use_alpha: false,
         valign: Gtk.Align.CENTER,
@@ -84,40 +80,37 @@ function createColorRow(settings, key, title) {
     return row;
 }
 
-function fillPreferencesWindow(window) {
-    const settings = getSettings();
-    
-    const page = new Adw.PreferencesPage();
-    
-    // Clock Group
-    const clockGroup = new Adw.PreferencesGroup({ title: 'Clock' });
-    
-    clockGroup.add(createClockFormatRow(settings));
-    
-    // Add switches
-    clockGroup.add(createSwitch(settings, 'show-seconds', 'Show Seconds'));
-    clockGroup.add(createSwitch(settings, 'show-date', 'Show Date'));
-    
-    page.add(clockGroup);
-    
-    // Calendar Widget Group
-    const calGroup = new Adw.PreferencesGroup({ title: 'Calendar Widget' });
-    calGroup.add(createSwitch(settings, 'show-calendar', 'Show Calendar'));
-    calGroup.add(createSwitch(settings, 'show-events', 'Show Events'));
-    calGroup.add(createSwitch(settings, 'show-world-clocks', 'Show World Clocks'));
-    calGroup.add(createSwitch(settings, 'show-weather', 'Show Weather'));
-    page.add(calGroup);
-    
-    // Behavior Group
-    const behaveGroup = new Adw.PreferencesGroup({ title: 'Behavior' });
-    behaveGroup.add(createSwitch(settings, 'workspace-popup', 'Workspace Popup'));
-    behaveGroup.add(createSwitch(settings, 'animations', 'Animations'));
-    behaveGroup.add(createSwitch(settings, 'workspace-indicator', 'Workspace Indicator'));
-    behaveGroup.add(createSwitch(settings, 'show-app-menu', 'App Menu'));
-    behaveGroup.add(createSwitch(settings, 'show-activities', 'Activities'));
-    behaveGroup.add(createColorRow(settings, 'gtk-popup-accent', 'GTK Popup Accent'));
-    
-    page.add(behaveGroup);
-    
-    window.add(page);
+export default class RenderOrangePreferences extends ExtensionPreferences {
+    fillPreferencesWindow(window) {
+        const settings = this.getSettings();
+
+        const page = new Adw.PreferencesPage();
+
+        // Clock Group
+        const clockGroup = new Adw.PreferencesGroup({title: 'Clock'});
+        clockGroup.add(createClockFormatRow(settings));
+        clockGroup.add(createSwitch(settings, 'show-seconds', 'Show Seconds'));
+        clockGroup.add(createSwitch(settings, 'show-date', 'Show Date'));
+        page.add(clockGroup);
+
+        // Calendar Widget Group
+        const calGroup = new Adw.PreferencesGroup({title: 'Calendar Widget'});
+        calGroup.add(createSwitch(settings, 'show-calendar', 'Show Calendar'));
+        calGroup.add(createSwitch(settings, 'show-events', 'Show Events'));
+        calGroup.add(createSwitch(settings, 'show-world-clocks', 'Show World Clocks'));
+        calGroup.add(createSwitch(settings, 'show-weather', 'Show Weather'));
+        page.add(calGroup);
+
+        // Behavior Group
+        const behaveGroup = new Adw.PreferencesGroup({title: 'Behavior'});
+        behaveGroup.add(createSwitch(settings, 'workspace-popup', 'Workspace Popup'));
+        behaveGroup.add(createSwitch(settings, 'animations', 'Animations'));
+        behaveGroup.add(createSwitch(settings, 'workspace-indicator', 'Workspace Indicator'));
+        behaveGroup.add(createSwitch(settings, 'show-app-menu', 'App Menu'));
+        behaveGroup.add(createSwitch(settings, 'show-activities', 'Activities'));
+        behaveGroup.add(createColorRow(settings, 'gtk-popup-accent', 'GTK Popup Accent'));
+        page.add(behaveGroup);
+
+        window.add(page);
+    }
 }
