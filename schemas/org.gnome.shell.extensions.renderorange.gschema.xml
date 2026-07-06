@@ -71,10 +71,5 @@
       <summary>Font hinting</summary>
       <description>Font hinting level: none, slight, medium, or full</description>
     </key>
-    <key name="gtk-popup-accent" type="s">
-      <default>"#444444"</default>
-      <summary>GTK popup accent color</summary>
-      <description>Accent color used for popup selections and toggles</description>
-    </key>
   </schema>
 </schemalist>

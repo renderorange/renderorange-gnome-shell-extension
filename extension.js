@@ -15,8 +15,6 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as WorkspaceSwitcherPopup from 'resource:///org/gnome/shell/ui/workspaceSwitcherPopup.js';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-import {normalizeHexColor, hexToRgba} from './lib.js';
-
 const UI_GROUP_CLASSES = [
     'renderorange-no-weather',
     'renderorange-no-world-clocks',
@@ -31,8 +29,6 @@ export default class RenderOrangeExtension extends Extension {
         this._workspaceSignalIds = [];
         this._workspaceClickId = 0;
         this._timeoutIds = [];
-        this._stylesheetFile = null;
-        this._stylesheetPath = null;
         this._clockOriginalParent = null;
         this._panelOriginalStyle = null;
 
@@ -50,8 +46,6 @@ export default class RenderOrangeExtension extends Extension {
                 this._configureClockFormat();
             if (key.startsWith('show-'))
                 this._configureCalendarVisibility();
-            if (key === 'gtk-popup-accent')
-                this._applyDynamicStyles();
             if (key === 'workspace-popup')
                 this._configureWorkspacePopup();
             if (key === 'animations')
@@ -83,7 +77,6 @@ export default class RenderOrangeExtension extends Extension {
         this._configureAnimations();
         this._configureWorkspaceIndicator();
         this._configureAppMenu();
-        this._applyDynamicStyles();
 
         this._timeoutIds.push(GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1000, () => {
             this._configureActivities();
@@ -97,7 +90,6 @@ export default class RenderOrangeExtension extends Extension {
             this._configureAnimations();
             this._configureWorkspaceIndicator();
             this._configureAppMenu();
-            this._applyDynamicStyles();
             return false;
         }));
 
@@ -113,7 +105,6 @@ export default class RenderOrangeExtension extends Extension {
             this._configureAnimations();
             this._configureWorkspaceIndicator();
             this._configureAppMenu();
-            this._applyDynamicStyles();
             return false;
         }));
     }
@@ -165,9 +156,6 @@ export default class RenderOrangeExtension extends Extension {
             this._workspaceIndicatorActor = null;
         }
 
-        // Unload dynamic stylesheet (#3)
-        this._unloadDynamicStyles();
-
         // Revert system GSettings to saved values (#5)
         try {
             this._interfaceSettings.set_string('clock-format', this._savedClockFormat);
@@ -201,146 +189,6 @@ export default class RenderOrangeExtension extends Extension {
                 console.warn(`[RenderOrange] Error reverting clock position: ${e}`);
             }
             this._clockOriginalParent = null;
-        }
-    }
-
-    _createDynamicStylesheet() {
-        // Use Gio.File.new_tmp for safe temp file creation (#9)
-        const [ok, file] = Gio.File.new_tmp('renderorange-dynamic-XXXXXX.css');
-        if (!ok)
-            throw new Error('Could not create temp file');
-        return file;
-    }
-
-    _applyDynamicStyles() {
-        const accent = normalizeHexColor(this._settings.get_string('gtk-popup-accent'));
-        const tilePreview = hexToRgba(accent, 0.5);
-
-        const css = `
-            .toggle-switch:checked,
-            .toggle-switch:active,
-            .popover-menu-item.selected,
-            .popover-menuitem.selected,
-            StButton.popup-menu-item.selected,
-            .popup-menu-item.selected,
-            .popup-menu-item:selected,
-            .calendar-day-selected:focus,
-            .calendar-day-selected:hover,
-            .calendar-day-selected,
-            .quick-menu-toggle:checked,
-            .quick-menu-toggle:checked:hover,
-            .quick-menu-toggle:checked:focus,
-            .quick-menu-toggle:checked:active,
-            .quick-toggle:checked,
-            .quick-toggle:checked:hover,
-            .quick-toggle:checked:focus,
-            .quick-toggle:checked:active,
-            .quick-toggle-menu .header .icon.active {
-                background-color: ${accent} !important;
-                background-image: none !important;
-                border-color: transparent !important;
-            }
-
-            .quick-toggle:checked,
-            .quick-toggle:checked:hover,
-            .quick-toggle:checked:focus,
-            .quick-toggle:checked:active {
-                color: #ffffff !important;
-            }
-
-            .slider,
-            .quick-settings .slider,
-            .quick-slider .slider {
-                -barlevel-active-background-color: ${accent} !important;
-                -barlevel-active-border-color: transparent !important;
-            }
-
-            .quick-slider .slider-bin:focus,
-            .quick-slider .slider-bin:focus:hover,
-            .quick-slider .slider-bin:focus:active {
-                box-shadow: inset 0 0 0 2px ${accent} !important;
-            }
-
-            StSwitch toggle-switch:checked {
-                background-color: ${accent} !important;
-            }
-
-            .quick-toggle:checked:focus {
-                box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.24) !important;
-            }
-
-            .tile-preview {
-                background-color: ${tilePreview} !important;
-                border: 1px solid ${accent} !important;
-            }
-        `;
-
-        const theme = St.ThemeContext.get_for_stage(global.stage).get_theme();
-        let stylesheet;
-
-        try {
-            stylesheet = this._createDynamicStylesheet();
-            const path = stylesheet.get_path();
-
-            if (!GLib.file_set_contents(path, css))
-                throw new Error('Could not write dynamic stylesheet to ' + path);
-
-            theme.load_stylesheet(stylesheet);
-        } catch (e) {
-            console.warn(`[RenderOrange] Failed to apply dynamic styles: ${e}`);
-            // Clean up partially created file (#3)
-            if (stylesheet) {
-                try {
-                    stylesheet.delete(null);
-                } catch (_deleteError) {
-                    // ignore
-                }
-            }
-            return;
-        }
-
-        // Only unload old stylesheet after new one is loaded (#3)
-        const oldFile = this._stylesheetFile;
-        const oldPath = this._stylesheetPath;
-
-        this._stylesheetFile = stylesheet;
-        this._stylesheetPath = stylesheet.get_path();
-
-        if (oldFile) {
-            try {
-                theme.unload_stylesheet(oldFile);
-            } catch (e) {
-                console.debug(`[RenderOrange] Could not unload previous stylesheet: ${e}`);
-            }
-        }
-
-        if (oldPath) {
-            try {
-                Gio.File.new_for_path(oldPath).delete(null);
-            } catch (e) {
-                console.debug(`[RenderOrange] Could not delete old stylesheet: ${e}`);
-            }
-        }
-    }
-
-    _unloadDynamicStyles() {
-        if (this._stylesheetFile) {
-            try {
-                const theme = St.ThemeContext.get_for_stage(global.stage).get_theme();
-                theme.unload_stylesheet(this._stylesheetFile);
-            } catch (e) {
-                console.warn(`[RenderOrange] Failed to unload dynamic stylesheet: ${e}`);
-            }
-            this._stylesheetFile = null;
-        }
-
-        if (this._stylesheetPath) {
-            try {
-                Gio.File.new_for_path(this._stylesheetPath).delete(null);
-            } catch (e) {
-                console.warn(`[RenderOrange] Failed to delete dynamic stylesheet file: ${e}`);
-            }
-            this._stylesheetPath = null;
         }
     }
 

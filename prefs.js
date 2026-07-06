@@ -7,7 +7,6 @@
 
 import Adw from 'gi://Adw';
 import Gtk from 'gi://Gtk';
-import Gdk from 'gi://Gdk';
 
 import {ExtensionPreferences} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
@@ -51,32 +50,6 @@ function createClockFormatRow(settings) {
             settings.set_string('clock-format', '24h');
     });
 
-    return row;
-}
-
-function createColorRow(settings, key, title) {
-    const row = new Adw.ActionRow({title});
-    const button = new Gtk.ColorButton({
-        use_alpha: false,
-        valign: Gtk.Align.CENTER,
-    });
-
-    const value = settings.get_string(key);
-    const initial = new Gdk.RGBA();
-    if (!initial.parse(value))
-        initial.parse('#444444');
-    button.set_rgba(initial);
-
-    button.connect('notify::rgba', () => {
-        const rgba = button.get_rgba();
-        const red = Math.round(rgba.red * 255).toString(16).padStart(2, '0');
-        const green = Math.round(rgba.green * 255).toString(16).padStart(2, '0');
-        const blue = Math.round(rgba.blue * 255).toString(16).padStart(2, '0');
-        settings.set_string(key, `#${red}${green}${blue}`);
-    });
-
-    row.add_suffix(button);
-    row.set_activatable_widget(button);
     return row;
 }
 
@@ -124,7 +97,6 @@ export default class RenderOrangePreferences extends ExtensionPreferences {
         behaveGroup.add(createSwitch(settings, 'workspace-indicator', 'Workspace Indicator'));
         behaveGroup.add(createSwitch(settings, 'show-app-menu', 'App Menu'));
         behaveGroup.add(createSwitch(settings, 'show-activities', 'Activities'));
-        behaveGroup.add(createColorRow(settings, 'gtk-popup-accent', 'GTK Popup Accent'));
         page.add(behaveGroup);
 
         // Font Rendering Group

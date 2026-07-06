@@ -77,7 +77,7 @@ describe('GSettings schema', () => {
             'clock-format', 'show-seconds', 'show-date', 'show-calendar',
             'show-events', 'show-world-clocks', 'show-weather',
             'workspace-popup', 'animations', 'workspace-indicator',
-            'show-app-menu', 'show-activities', 'gtk-popup-accent',
+            'show-app-menu', 'show-activities',
         ];
         for (const key of expectedKeys) {
             assert.ok(xml.includes(key), `Schema missing key: ${key}`);
