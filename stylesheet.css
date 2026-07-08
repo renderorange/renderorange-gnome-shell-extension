@@ -67,50 +67,6 @@ stage {
     border-radius: 8px !important;
 }
 
-/* Dock app icon corner radius */
-#dash .app-well-app .overview-icon,
-#dash .show-apps .overview-icon,
-.dash-item-container .app-well-app .overview-icon,
-.dash-item-container .show-apps .overview-icon {
-    border-radius: 8px !important;
-}
-
-/* Remove focus/checked highlight on dash icons */
-#dash .overview-tile:checked .overview-icon,
-.dash-item-container .overview-tile:checked .overview-icon {
-    background-color: transparent !important;
-    box-shadow: none !important;
-}
-
-/* Dock container corner radius */
-.dash-background {
-    border-radius: 8px !important;
-    padding: 5px 0 !important;
-}
-
-/* Reduce dash item margins to match */
-#dash .dash-item-container .show-apps,
-#dash .dash-item-container .overview-tile {
-    margin: 0 0 !important;
-}
-
-/* Remove dash item container padding */
-#dash .dash-item-container {
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-/* Also target the padding on dash itself */
-#dash {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}
-
-/* Dock tooltip border-radius */
-.dash-label {
-    border-radius: 8px !important;
-}
-
 /* Calendar day styling */
 .calendar-day {
     border: none !important;
@@ -142,10 +98,6 @@ stage {
 /* Remove the separator line between split button halves */
 .quick-toggle-separator {
     background-color: transparent !important;
-}
-
-.dash-item-container > * {
-    margin: 0 !important;
 }
 
 /* Custom workspace indicator */
